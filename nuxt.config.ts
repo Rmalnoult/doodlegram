@@ -1,10 +1,19 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   modules: [
+    '@sentry/nuxt/module',
     '@nuxt/eslint',
     '@nuxt/ui',
     '@nuxtjs/supabase'
   ],
+
+  sentry: {
+    sourceMapsUploadOptions: {
+      org: 'romain-malnoult',
+      project: 'doodlegram',
+    },
+    enabled: process.env.NODE_ENV === 'production',
+  },
 
   devtools: {
     enabled: true
@@ -20,9 +29,11 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     anthropicApiKey: process.env.ANTHROPIC_API_KEY,
+    openaiApiKey: process.env.OPENAI_API_KEY,
     falKey: process.env.FAL_KEY,
     public: {
-      appUrl: process.env.NUXT_PUBLIC_APP_URL || 'http://localhost:3000'
+      appUrl: process.env.NUXT_PUBLIC_APP_URL || 'http://localhost:3000',
+      sentryDsn: process.env.NUXT_PUBLIC_SENTRY_DSN || '',
     }
   },
 
@@ -47,6 +58,35 @@ export default defineNuxtConfig({
         { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' },
         { rel: 'canonical', href: 'https://doodlegram.app' }
       ]
+    }
+  },
+
+  vite: {
+    resolve: {
+      conditions: ['production']
+    },
+    optimizeDeps: {
+      include: ['react', 'react-dom', 'react-dom/client']
+    },
+    plugins: [
+      // Fix CJS interop: cookie@1.x is CJS-only but @supabase/ssr imports it as ESM.
+      // When Vite serves via @fs/, CJS modules get no ESM wrapping.
+      // This plugin converts cookie's CJS to ESM by stripping CJS boilerplate.
+      {
+        name: 'fix-cookie-esm',
+        transform(code, id) {
+          if (id.includes('node_modules/cookie/dist/index.js')) {
+            return code
+              .replace('"use strict";', '')
+              .replace(/Object\.defineProperty\(exports.*?\);/s, '')
+              .replace(/^exports\.\w+\s*=\s*\w+;$/gm, '')
+              + '\nexport { parseCookie, parseCookie as parse, stringifyCookie, stringifySetCookie, stringifySetCookie as serialize, parseSetCookie };\n'
+          }
+        }
+      }
+    ],
+    ssr: {
+      noExternal: ['veaury']
     }
   },
 
