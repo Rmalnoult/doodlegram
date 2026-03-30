@@ -20,15 +20,8 @@ export default defineEventHandler(async (event) => {
   })
 
   const client = getClaudeClient()
+  const openai = getOpenAIClient()
   resetElementCounter()
-
-  const userMessage = category
-    ? `Subject: ${category}. Create a diagram for: ${prompt}`
-    : `Create a diagram for: ${prompt}`
-
-  const messages: Anthropic.Messages.MessageParam[] = [
-    { role: 'user', content: userMessage }
-  ]
 
   const allElements: unknown[] = []
   const allFiles: Record<string, unknown> = {}
@@ -43,7 +36,42 @@ export default defineEventHandler(async (event) => {
     event.node.res.write(`data: ${payload}\n\n`)
   }
 
-  sendSSE('progress', { message: 'Starting diagram generation...' })
+  sendSSE('progress', { message: 'Researching topic...' })
+
+  // Phase 1: Research with OpenAI
+  let researchPlan = ''
+  try {
+    const researchPrompt = category
+      ? `Subject area: ${category}. Create a detailed diagram blueprint for: ${prompt}`
+      : `Create a detailed diagram blueprint for: ${prompt}`
+
+    const research = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      max_tokens: 2000,
+      messages: [
+        { role: 'system', content: RESEARCH_SYSTEM_PROMPT },
+        { role: 'user', content: researchPrompt }
+      ]
+    })
+
+    researchPlan = research.choices[0]?.message?.content || ''
+    sendSSE('progress', { message: 'Research complete. Building diagram...' })
+  } catch {
+    sendSSE('progress', { message: 'Research skipped. Building diagram...' })
+  }
+
+  // Phase 2: Build diagram with Claude using the research plan
+  const userMessage = researchPlan
+    ? `Create a diagram for: ${prompt}\n\n## Research & Planning\nA research assistant analyzed this topic and produced the following blueprint. Follow it closely:\n\n${researchPlan}`
+    : category
+      ? `Subject: ${category}. Create a diagram for: ${prompt}`
+      : `Create a diagram for: ${prompt}`
+
+  const messages: Anthropic.Messages.MessageParam[] = [
+    { role: 'user', content: userMessage }
+  ]
+
+  sendSSE('progress', { message: 'Drawing diagram...' })
 
   try {
     // Agent loop

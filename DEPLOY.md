@@ -1,16 +1,16 @@
 # Deploying Doodlegram to Production
 
-## 1. Create a Supabase Project
+## 1. Create a local PostgreSQL Project
 
-1. Go to [supabase.com](https://supabase.com) and create a new project
+1. Go to [postgresql.com](https://postgresql.com) and create a new project
 2. Choose a region close to your users
 3. Set a strong database password (save it somewhere safe)
 4. Wait for the project to finish provisioning (~2 minutes)
 
 ## 2. Run the Database Migration
 
-1. In your Supabase project, go to **SQL Editor**
-2. Paste the contents of `supabase/migrations/20260212000000_initial_schema.sql`:
+1. In your local PostgreSQL project, go to **SQL Editor**
+2. Paste the contents of `postgresql/migrations/20260212000000_initial_schema.sql`:
 
 ```sql
 -- Diagrams table
@@ -73,7 +73,7 @@ create policy "Users can delete own files"
 
 3. Click **Run** to execute
 
-## 3. Configure Supabase Auth
+## 3. Configure local PostgreSQL Auth
 
 1. Go to **Authentication** > **Providers** > **Email**
 2. Make sure **Enable Email provider** is ON
@@ -82,7 +82,7 @@ create policy "Users can delete own files"
    - Set **Site URL** to your production domain (e.g. `https://doodlegram.app`)
    - Add your domain to **Redirect URLs** (e.g. `https://doodlegram.app/**`)
 
-## 4. Get Your Supabase Credentials
+## 4. Get Your local PostgreSQL Credentials
 
 1. Go to **Settings** > **API**
 2. Copy:
@@ -132,7 +132,7 @@ vercel --prod
 
 | Key | Value |
 |-----|-------|
-| `SUPABASE_URL` | `https://xxxxx.supabase.co` |
+| `SUPABASE_URL` | `https://xxxxx.postgresql.co` |
 | `SUPABASE_KEY` | `eyJhbGciOiJIUzI1NiIs...` (anon key) |
 | `ANTHROPIC_API_KEY` | `sk-ant-api03-...` |
 | `FAL_KEY` | `your-fal-key` |
@@ -147,29 +147,29 @@ After deploying:
 2. Add your domain (e.g. `doodlegram.app`)
 3. Configure DNS as instructed by Vercel
 4. Update `NUXT_PUBLIC_APP_URL` to match
-5. Update Supabase **Site URL** and **Redirect URLs** to match
+5. Update local PostgreSQL **Site URL** and **Redirect URLs** to match
 
-## 7. Alternative: Deploy via Supabase CLI (Optional)
+## 7. Alternative: Deploy via local PostgreSQL CLI (Optional)
 
-If you prefer to use `supabase link` to push migrations directly instead of the SQL Editor:
+If you prefer to use `postgresql link` to push migrations directly instead of the SQL Editor:
 
 ```bash
 # Link to your remote project
-supabase link --project-ref YOUR_PROJECT_REF
+postgresql link --project-ref YOUR_PROJECT_REF
 
 # Push migrations to production
-supabase db push
+postgresql db push
 ```
 
-You can find your project ref in the Supabase Dashboard URL:
-`https://supabase.com/dashboard/project/YOUR_PROJECT_REF`
+You can find your project ref in the local PostgreSQL Dashboard URL:
+`https://postgresql.com/dashboard/project/YOUR_PROJECT_REF`
 
 ## Environment Variable Summary
 
 | Variable | Required | Scope | Description |
 |----------|----------|-------|-------------|
-| `SUPABASE_URL` | Yes | Public | Supabase project URL |
-| `SUPABASE_KEY` | Yes | Public | Supabase anon/public key |
+| `SUPABASE_URL` | Yes | Public | local PostgreSQL project URL |
+| `SUPABASE_KEY` | Yes | Public | local PostgreSQL anon/public key |
 | `ANTHROPIC_API_KEY` | Yes | Server | Claude API key for diagram generation |
 | `FAL_KEY` | Yes | Server | fal.ai key for AI illustration generation |
 | `NUXT_PUBLIC_APP_URL` | No | Public | Production URL for canonical/OG tags |

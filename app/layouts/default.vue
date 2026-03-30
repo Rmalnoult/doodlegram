@@ -31,6 +31,7 @@ async function logout() {
           <UDropdownMenu
             :items="[
               { label: user.email || 'Account', icon: 'i-lucide-user', disabled: true },
+              { label: 'Settings', icon: 'i-lucide-settings', onSelect: () => navigateTo('/settings') },
               { label: 'Logout', icon: 'i-lucide-log-out', onSelect: logout }
             ]"
           >

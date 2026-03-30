@@ -2,7 +2,7 @@
 
 AI-powered educational diagram generator. Describe a concept and get a hand-drawn Excalidraw-style diagram instantly.
 
-Built with Nuxt 4, Supabase, Claude AI, and fal.ai.
+Built with Nuxt 4, local PostgreSQL, Claude AI, and fal.ai.
 
 ## Features
 
@@ -20,7 +20,7 @@ Built with Nuxt 4, Supabase, Claude AI, and fal.ai.
 |-------|-----------|
 | Framework | Nuxt 4.3 + Vue 3 |
 | UI | @nuxt/ui v3 + Tailwind CSS 4 |
-| Auth & DB | Supabase (Postgres + Auth + Storage) |
+| Auth & DB | local PostgreSQL (Postgres + Auth + Storage) |
 | AI | Anthropic Claude Sonnet 4.5 |
 | Images | fal.ai Recraft V3 |
 | Deploy | Vercel |
@@ -29,7 +29,7 @@ Built with Nuxt 4, Supabase, Claude AI, and fal.ai.
 
 | Variable | Required | Where to get it |
 |----------|----------|----------------|
-| `SUPABASE_URL` | Yes | `supabase start` output or Supabase Dashboard > Settings > API |
+| `SUPABASE_URL` | Yes | `postgresql start` output or local PostgreSQL Dashboard > Settings > API |
 | `SUPABASE_KEY` | Yes | Same as above (use the `anon` / `public` key) |
 | `ANTHROPIC_API_KEY` | Yes | [console.anthropic.com/settings/keys](https://console.anthropic.com/settings/keys) |
 | `FAL_KEY` | Yes | [fal.ai/dashboard/keys](https://fal.ai/dashboard/keys) |
@@ -43,7 +43,7 @@ Built with Nuxt 4, Supabase, Claude AI, and fal.ai.
 
 - Node.js 20+
 - pnpm
-- Docker (via [OrbStack](https://orbstack.dev/) or Docker Desktop) for local Supabase
+- Docker (via [OrbStack](https://orbstack.dev/) or Docker Desktop) for local local PostgreSQL
 
 ### Setup
 
@@ -56,19 +56,19 @@ pnpm install
 # Copy env file and fill in your API keys
 cp .env.example .env
 
-# Start local Supabase (runs Postgres, Auth, Storage, Studio)
-supabase start
+# Start local local PostgreSQL (runs Postgres, Auth, Storage, Studio)
+postgresql start
 
 # The output will show your SUPABASE_URL and SUPABASE_KEY — paste them into .env
 
 # Run database migrations
-supabase db push
+postgresql db push
 
 # Start dev server
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). Supabase Studio is at [http://localhost:54323](http://localhost:54323).
+Open [http://localhost:3000](http://localhost:3000). local PostgreSQL Studio is at [http://localhost:54323](http://localhost:54323).
 
 ## Production Deployment
 
@@ -76,8 +76,8 @@ See [DEPLOY.md](./DEPLOY.md) for full instructions.
 
 **Quick version:**
 
-1. Create a Supabase project at [supabase.com](https://supabase.com)
-2. Run the migration SQL in the Supabase SQL Editor
+1. Create a local PostgreSQL project at [postgresql.com](https://postgresql.com)
+2. Run the migration SQL in the local PostgreSQL SQL Editor
 3. Deploy to Vercel with `vercel --prod`
 4. Set environment variables in Vercel dashboard
 
@@ -94,9 +94,9 @@ server/
   api/diagrams/   # generate (SSE), generate-quick, save, [id].get, [id].delete
   api/images/     # generate (fal.ai)
   utils/          # claude, fal, agent-tools, prompts
-supabase/
+postgresql/
   migrations/     # initial schema (diagrams table, RLS, storage bucket)
-  config.toml     # local Supabase config
+  config.toml     # local local PostgreSQL config
 ```
 
 ## License

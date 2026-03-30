@@ -3,8 +3,7 @@ export default defineNuxtConfig({
   modules: [
     '@sentry/nuxt/module',
     '@nuxt/eslint',
-    '@nuxt/ui',
-    '@nuxtjs/supabase'
+    '@nuxt/ui'
   ],
 
   sentry: {
@@ -28,6 +27,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-01-15',
 
   runtimeConfig: {
+    databaseUrl: process.env.DATABASE_URL,
     anthropicApiKey: process.env.ANTHROPIC_API_KEY,
     openaiApiKey: process.env.OPENAI_API_KEY,
     falKey: process.env.FAL_KEY,
@@ -35,10 +35,6 @@ export default defineNuxtConfig({
       appUrl: process.env.NUXT_PUBLIC_APP_URL || 'http://localhost:3000',
       sentryDsn: process.env.NUXT_PUBLIC_SENTRY_DSN || '',
     }
-  },
-
-  supabase: {
-    redirect: false
   },
 
   app: {
@@ -68,23 +64,6 @@ export default defineNuxtConfig({
     optimizeDeps: {
       include: ['react', 'react-dom', 'react-dom/client']
     },
-    plugins: [
-      // Fix CJS interop: cookie@1.x is CJS-only but @supabase/ssr imports it as ESM.
-      // When Vite serves via @fs/, CJS modules get no ESM wrapping.
-      // This plugin converts cookie's CJS to ESM by stripping CJS boilerplate.
-      {
-        name: 'fix-cookie-esm',
-        transform(code, id) {
-          if (id.includes('node_modules/cookie/dist/index.js')) {
-            return code
-              .replace('"use strict";', '')
-              .replace(/Object\.defineProperty\(exports.*?\);/s, '')
-              .replace(/^exports\.\w+\s*=\s*\w+;$/gm, '')
-              + '\nexport { parseCookie, parseCookie as parse, stringifyCookie, stringifySetCookie, stringifySetCookie as serialize, parseSetCookie };\n'
-          }
-        }
-      }
-    ],
     ssr: {
       noExternal: ['veaury']
     }

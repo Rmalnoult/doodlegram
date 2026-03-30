@@ -35,5 +35,44 @@ export const useExcalidrawExport = () => {
     URL.revokeObjectURL(url)
   }
 
-  return { exportAsPng, exportAsSvg }
+  async function generateThumbnail(
+    elements: unknown[],
+    files: Record<string, unknown>
+  ): Promise<Blob> {
+    const { exportToBlob } = await import('@excalidraw/utils')
+
+    const fullBlob = await exportToBlob({
+      elements: elements as never[],
+      files: files as never,
+      mimeType: 'image/png',
+      exportPadding: 10
+    })
+
+    // Resize to max 400px wide for thumbnail
+    return new Promise((resolve, reject) => {
+      const img = new Image()
+      img.onload = () => {
+        const maxWidth = 400
+        const scale = Math.min(1, maxWidth / img.width)
+        const canvas = document.createElement('canvas')
+        canvas.width = Math.round(img.width * scale)
+        canvas.height = Math.round(img.height * scale)
+        const ctx = canvas.getContext('2d')!
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+        canvas.toBlob(
+          (result) => result ? resolve(result) : reject(new Error('Canvas toBlob failed')),
+          'image/png',
+          0.8
+        )
+        URL.revokeObjectURL(img.src)
+      }
+      img.onerror = () => {
+        URL.revokeObjectURL(img.src)
+        reject(new Error('Failed to load image for thumbnail'))
+      }
+      img.src = URL.createObjectURL(fullBlob)
+    })
+  }
+
+  return { exportAsPng, exportAsSvg, generateThumbnail }
 }
