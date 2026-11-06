@@ -6,7 +6,8 @@ export function getClaudeClient(): Anthropic {
   if (!client) {
     const config = useRuntimeConfig()
     client = new Anthropic({
-      apiKey: config.anthropicApiKey
+      apiKey: config.aiApiKey,
+      baseURL: config.aiAnthropicBaseUrl
     })
   }
   return client

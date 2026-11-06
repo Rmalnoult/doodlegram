@@ -6,6 +6,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Prompt is required' })
   }
 
+  const config = useRuntimeConfig()
   const client = getClaudeClient()
 
   const userMessage = category
@@ -13,7 +14,7 @@ export default defineEventHandler(async (event) => {
     : `Create a diagram for: ${prompt}`
 
   const response = await client.messages.create({
-    model: 'claude-sonnet-4-5-20250929',
+    model: config.aiModel,
     max_tokens: 2048,
     system: QUICK_MODE_SYSTEM_PROMPT,
     messages: [{ role: 'user', content: userMessage }],

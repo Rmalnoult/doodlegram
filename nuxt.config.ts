@@ -28,8 +28,12 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     databaseUrl: process.env.DATABASE_URL,
-    anthropicApiKey: process.env.ANTHROPIC_API_KEY,
-    openaiApiKey: process.env.OPENAI_API_KEY,
+    // DeepSeek serves both wire formats, so both clients stay and only the
+    // endpoint, key and model change. See server/utils/{claude,openai}.ts.
+    aiApiKey: process.env.DEEPSEEK_API_KEY || '',
+    aiAnthropicBaseUrl: process.env.AI_BASE_URL || 'https://api.deepseek.com/anthropic',
+    aiOpenAiBaseUrl: process.env.AI_OPENAI_BASE_URL || 'https://api.deepseek.com',
+    aiModel: process.env.AI_MODEL || 'deepseek-flash',
     falKey: process.env.FAL_KEY,
     public: {
       appUrl: process.env.NUXT_PUBLIC_APP_URL || 'http://localhost:3000',

@@ -19,6 +19,7 @@ export default defineEventHandler(async (event) => {
     'Connection': 'keep-alive'
   })
 
+  const config = useRuntimeConfig()
   const client = getClaudeClient()
   const openai = getOpenAIClient()
   resetElementCounter()
@@ -46,7 +47,7 @@ export default defineEventHandler(async (event) => {
       : `Create a detailed diagram blueprint for: ${prompt}`
 
     const research = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: config.aiModel,
       max_tokens: 2000,
       messages: [
         { role: 'system', content: RESEARCH_SYSTEM_PROMPT },
@@ -79,7 +80,7 @@ export default defineEventHandler(async (event) => {
       iterations++
 
       const response = await client.messages.create({
-        model: 'claude-sonnet-4-5-20250929',
+        model: config.aiModel,
         max_tokens: 4096,
         system: AGENT_SYSTEM_PROMPT,
         messages,

@@ -6,7 +6,8 @@ export function getOpenAIClient(): OpenAI {
   if (!client) {
     const config = useRuntimeConfig()
     client = new OpenAI({
-      apiKey: config.openaiApiKey
+      apiKey: config.aiApiKey,
+      baseURL: config.aiOpenAiBaseUrl
     })
   }
   return client
